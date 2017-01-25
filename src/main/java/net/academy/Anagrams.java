@@ -16,17 +16,22 @@ class Anagrams {
     private static int maxSize;
     private static int maxLength;
 
+    private static String sortString(String value) {
+        char[] array = value.toCharArray();
+        Arrays.sort(array);
+        return new String(array);
+    }
+
     public static void main(String args[]) throws URISyntaxException {
 
         try (Stream<String> stream = Files.lines(Paths.get(Anagrams.class.getResource(dictionaryFile).toURI()))) {
+
             long startTime = System.nanoTime();
+
             List<List<String>> anagrams = stream
-                    .collect(Collectors.groupingBy(s -> {
-                        char[] v = s.toCharArray();
-                        Arrays.sort(v);
-                        return new String(v);
-                    }))
+                    .collect(Collectors.groupingBy(Anagrams::sortString))
                     .values().stream().filter(group -> group.size() > 1).collect(Collectors.toList());
+
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) / 1000000;
 
@@ -46,9 +51,10 @@ class Anagrams {
             System.out.println("============================");
             System.out.printf("anagram groups found: %s\n", anagrams.size());
             System.out.printf("duration: %s ms\n", duration);
-            System.out.printf("largest group: (%d members) - %s\n", mostCommon.size(), mostCommon);
-            System.out.printf("longest anagram: %s\n", longest);
-
+            if (anagrams.size() > 0) {
+                System.out.printf("largest group: (%d members) - %s\n", mostCommon.size(), mostCommon);
+                System.out.printf("longest anagram: %s\n", longest);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
