@@ -20,24 +20,26 @@ class Anagrams {
 
         try (Stream<String> stream = Files.lines(Paths.get(Anagrams.class.getResource(dictionaryFile).toURI()))) {
             long startTime = System.nanoTime();
-            List<List<String>> anagrams = stream.collect(Collectors.groupingBy(s -> {
-                char[] v = s.toCharArray();
-                Arrays.sort(v);
-                return new String(v);
-            })).values().stream().filter(v -> v.size() > 1).collect(Collectors.toList());
+            List<List<String>> anagrams = stream
+                    .collect(Collectors.groupingBy(s -> {
+                        char[] v = s.toCharArray();
+                        Arrays.sort(v);
+                        return new String(v);
+                    }))
+                    .values().stream().filter(group -> group.size() > 1).collect(Collectors.toList());
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) / 1000000;
 
-            anagrams.forEach(v -> {
-                        v.forEach(s -> System.out.printf("%s ", s));
+            anagrams.forEach(group -> {
+                        group.forEach(s -> System.out.printf("%s ", s));
                         System.out.println();
-                        if (v.size() > maxSize) {
-                            maxSize = v.size();
-                            mostCommon = v;
+                        if (group.size() > maxSize) {
+                            maxSize = group.size();
+                            mostCommon = group;
                         }
-                        if (v.get(0).length() > maxLength) {
-                            maxLength = v.get(0).length();
-                            longest = v;
+                        if (group.get(0).length() > maxLength) {
+                            maxLength = group.get(0).length();
+                            longest = group;
                         }
                     }
             );
